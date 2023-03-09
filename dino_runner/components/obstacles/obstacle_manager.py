@@ -1,30 +1,35 @@
 import pygame 
 import random
-from dino_runner.components.obstacles.cactus import Cactus
-from dino_runner.utils.constants import SMALL_CACTUS
+from dino_runner.components.obstacles.cactus import SmallCactus
+from dino_runner.components.obstacles.cactus import LargeCactus
+
+from dino_runner.utils.constants import BIRD, SMALL_CACTUS, LARGE_CACTUS
 
 from dino_runner.components.obstacles.bird import Bird
-from dino_runner.utils.constants import BIRD
 
 
 class ObstacleManager():
 
     def __init__(self):
         self.obstacles =[]
-    
-    def update(self, game_speed, game):
+
+    def update(self, game_speed, game, screen):
         if len(self.obstacles) == 0:
             if random.randint(0, 2) == 0:
-                self.obstacles.append(Cactus(SMALL_CACTUS))
+                self.obstacles.append(SmallCactus(SMALL_CACTUS))
             elif random.randint(0, 2) == 1:
                 self.obstacles.append(Bird(BIRD))
+            elif random.randint(0,2) == 2:
+                self.obstacles.append(LargeCactus(LARGE_CACTUS))
     
         for obstacle in self.obstacles:
             obstacle.update(game_speed,self.obstacles)
+
             if game.player.dino_rect.colliderect(obstacle.rect):
-                game.heart_manager.reduce_heart()
+                if not game.player.shield:
+                    game.heart_manager.reduce_heart()
                 if game.heart_manager.heart_count < 1:
-                    pygame.time.delay(300)
+                    pygame.time.delay(2000)
                     game.playing = False
                     break
                 else:
@@ -33,3 +38,4 @@ class ObstacleManager():
     def draw(self, screen):
         for obstacle in self.obstacles:
             obstacle.draw(screen)
+

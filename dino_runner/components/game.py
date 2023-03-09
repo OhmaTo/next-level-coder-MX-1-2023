@@ -7,12 +7,14 @@ from dino_runner.utils.constants import (
     SCREEN_WIDTH, 
     TITLE, 
     FPS, 
-    FONT_ARIAL)
+    FONT_ARIAL,
+    CLOUD)
 
 from dino_runner.components.dinosaur import Dinosaur
-from dino_runner.components.obstacles.obstacle_manager import ObstacleManager
 
+from dino_runner.components.obstacles.obstacle_manager import ObstacleManager
 from dino_runner.components.player_hearts.heart_manager import HeartManager
+from dino_runner.components.power_ups.power_up_manager import PowerUpManager
 
 class Game:
     def __init__(self):
@@ -29,12 +31,14 @@ class Game:
         self.player = Dinosaur()
         self.obstacle_manager = ObstacleManager()
         self.heart_manager = HeartManager()
+        self.power_up_manager = PowerUpManager()
         self.points = 0
 
     def increase_score(self):
         self.points += 1
         if self.points % 100 == 0:
-            self.game_speed += 1 
+            self.game_speed += 1
+        self.player.check_invincibility()
     
     def run(self):
         # Game loop: events - update - draw
@@ -53,7 +57,8 @@ class Game:
     def update(self):
         user_input = pygame.key.get_pressed()
         self.player.update(user_input)
-        self.obstacle_manager.update(self.game_speed, self)
+        self.obstacle_manager.update(self.game_speed, self, self.screen)
+        self.power_up_manager.update(self.points, self.game_speed, self.player)
         self.increase_score()
     
     def draw(self):
@@ -63,6 +68,7 @@ class Game:
         self.player.draw(self.screen)
         self.obstacle_manager.draw(self.screen)
         self.draw_score()
+        self.power_up_manager.draw(self.screen)
         self.heart_manager.draw(self.screen)
         pygame.display.update()
         pygame.display.flip()
@@ -77,10 +83,10 @@ class Game:
         self.x_pos_bg -= self.game_speed
 
     def draw_score(self):
-        font = pygame.font.Font(FONT_ARIAL, 40)
-        surface  = font.render(str(self.points),True,(0,0,0))
+        font = pygame.font.Font(FONT_ARIAL, 20)
+        surface  = font.render(f"Current score: {str(self.points)}",True,(0,0,0))
         rect = surface.get_rect()
-        rect.x = 1000
+        rect.x = 950
         rect.y = 10
         self.screen.blit(surface, rect)
 
