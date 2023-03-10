@@ -1,20 +1,21 @@
 from pygame.sprite import Sprite
 from dino_runner.utils.constants import SCREEN_WIDTH
+import random
 
 class PowerUp(Sprite):
-    def __init__(self,image, type):
+    def __init__(self, image, type):
         print("power")
         self.image = image
         self.type = type
         self.rect = image.get_rect()
         self.rect.x = SCREEN_WIDTH
-        self.rect.y = 125
-    
+        self.rect.y = random.randrange(175,400)
+
     def update(self, game_speed, powerups):
         self.rect.x -= game_speed
-        
+
         if self.rect.x < 0:
             powerups.pop()
-    
+
     def draw(self, screen):
         screen.blit(self.image, self.rect)
